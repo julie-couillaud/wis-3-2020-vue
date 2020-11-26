@@ -1,24 +1,153 @@
 <!DOCTYPE html>
-<html>
+
+<html lang="fr">
+
 <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Julie COUILLAUD - WIS 3</title>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <style>
+	<!-- insertion d'un favicon sur le site -->
+	<link rel="icon" href="img/bicycle.png">
+
+	<title>Mon vélo - WIS 3</title>
+
+	<!-- On se connecte à Bootstrap -->
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+	<style>
+
+		@import url('https://fonts.googleapis.com/css2?family=Amatic+SC:wght@700&display=swap');
 
 
+		@import url('https://fonts.googleapis.com/css2?family=Lato&display=swap');
 
-    </style>
+		h1{
+			font-size: 40px;
+			text-shadow: -3px 0 4px #bf586f;
+		}
+
+		h1, h2, h3{
+			font-family: 'Amatic SC', cursive;
+		}
+
+		body{
+			font-family: 'Lato', sans-serif;
+			margin: auto;
+		}
+
+	</style>
 
 </head>
-<body>
 
-<div id="main">
+<body class="container">
+
+	<header>
+		<nav class="navbar navbar-dark bg-dark">
+			<a class="navbar-brand" href="#"> Application Vue.js - Julie Couillaud</a>
+
+		<!-- <form class="form-inline my-2 my-lg-0">
+	      <input class="form-control mr-sm-2" type="search" placeholder="Rechercher" aria-label="Search">
+	      <button class="btn btn-outline-info my-2 my-sm-0" type="submit">Ok</button>
+  		</form> -->
+</nav>
+
+</header>
+
+<h1 style="text-align: center; color: #bf586f">Trouver la station pour garer mon vélo 🚴</h1>
+
+<!-- Appel à l'API -->
+<div id="app">
+
+	<!-- Partie Template -->
+	<div class="row" v-if="display">
+
+		<!-- Fais appel à l'API pour charger les dernières données / les plus récentes -->
+		<button type="button" class="btn btn-info center-block" @click="fetchData()">Charger les données</button>
+		<br>
+	</div>
+
+	<div class="row">
+
+
+		<!-- Tous les évènements sont des réponses -->
+		<div v-for="evt in response" class="card border-info my-2 mx-14" style="width: 25rem; text-align: center">
+
+			<!-- Affiche le nom de la station de vélo -->
+			<h2 class="card-header border-info" style="text-align: center">{{evt.fields.name}}</h2>
+			<div class="card-body border-info">
+				<!-- Affiche le nom de l'adresse de la station de vélo -->
+				<h3 class="card-title">La station est {{evt.fields.status}} !</h3>
+				<p class="card-text">
+					<!-- Affiche le nombre de support de vélos libres en temps réel -->
+					<span> Il y a {{evt.fields.bike_stands}} supports de vélos libres. </span>
+					<div>{{evt.fields.address}}</div>
+					<br>
+					<!-- Bouton qui permet de connaître la position GPS de la station de vélo -->
+					<a href="https://www.google.fr/maps/place/15+Rue+de+Verdun,+44000+Nantes/@47.217453,-1.5540383,17z/data=!3m1!4b1!4m5!3m4!1s0x4805eea48de89c77:0xf8db1f86f4ca4381!8m2!3d47.217453!4d-1.551855" class="btn btn-info ">ME RENDRE A LA STATION</a>
+
+
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+
+<!-- Permet d'afficher la totalité de l'API pour débuguer-->
+<pre>{{response}}<pre>
+
 
 </div>
 
-</script>
-</body>
-</html>
+<footer class="bg-dark text-white fixed-bottom text-center"> © 2020. Julie COUILLAUD - WIS 3</footer>
+
+
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script>
+	  		// On récupère les données de l'API
+	  		var apiURL = 'https://data.nantesmetropole.fr/api/records/1.0/search/?dataset=244400404_stations-velos-libre-service-nantes-metropole-disponibilites&q=&facet=banking&facet=bonus&facet=status&facet=contract_name'
+	  		
+
+	  		/** Partie Vue.js */
+
+	  		var demo = new Vue({
+				// partie dans le HTML que vue doit enregistrer
+				el: '#app',
+
+				data: {
+					response: [],
+					// on recupère les données de l'API, mais on ne les affiche pas 
+					display: false,
+				},
+
+				created: function () {
+					this.fetchData()
+				},
+
+
+				methods: {
+					fetchData: function () {
+						var self = this
+						axios.get(apiURL)
+						.then(function (response) {
+							console.log(response)
+							// record permet de rentrer dans la boucle
+							self.response = response.data.records
+							// quand on trouve les données de l'API, les afficher
+							self.display = true
+						})
+					  // permet d'afficher error s'il y a une erreur dans le code
+					  .catch(function (error) {
+					  	console.log(error);
+					  })
+					}
+				}
+			})
+
+		</script>
+
+	</body>
+	</html>
